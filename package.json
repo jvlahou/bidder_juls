@@ -1,0 +1,26 @@
+{
+  "name": "bidder",
+  "version": "1.0.0",
+  "description": "AvocarrotTest",
+  "main": "bidder_server.js",
+  "scripts": {
+    "test": "test/test_response_bid.js"
+  },
+  "author": "Juls",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "-"
+  },
+  "dependencies": {
+    "express": "^4.16.2"
+  },
+  "devDependencies": {
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "mocha": "^4.0.1",
+    "request": "^2.83.0"
+  }
+}
