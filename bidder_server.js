@@ -5,6 +5,8 @@ var express = require('express');
 var bodyParser = require("body-parser");
 var request = require("request");
 var config = require('_config');
+var async = require('async');
+var rp = require('request-promise');
 // Create the app
 var app = express();
 
@@ -14,7 +16,8 @@ app.use(bodyParser.json());
 
 //Global vars
 var jsonRes; //Final response
-var matchingCampaign = false; //Flag raised when a matching campaign was found
+var matchingCampaign;
+
 
 // Set up the server
 // process.env.PORT is related to deploying on heroku
@@ -30,85 +33,84 @@ function listen() {
 }
 
 
-/*
-//middleware function mounted on /bid path
-app.use('/bid', function (req, res, body, next) {
- 	
-	});
- */
 
-
-app.use('/bid', function(req, res, body) {
+app.post('/bid',function(req, res) {
+	
 	console.log('\nPOST bid is called');
+	console.log("Body:" + req.body);
+ 	
+	var adExchangeRequestId = req.body.id;
+	var adExchangeCountry = req.body.device.geo.country;
+	var campaignServiceError = 204;
 
- 	var matchedCampaigns = [];
-  var winningCampaign;
-  //var adExchangeCountry = "USA";
-  
-   var adExchangeRequestBody = req.body;
-   console.log("Body:" +JSON.parse(body));
-   for (var item in body){
-		console.log("key:" + item + "Value:" + adExchangeRequestBody[key]);
-   }
-   
-   var adExchangeCountry = "USA";
-   console.log("AdExchange requests bid for Country::::" + adExchangeCountry);
- 
-  //Call external api
-  request.get(config.campaignsURI.development, function (err, res, body) {
-    if (!err) {
-          body = JSON.parse(body);
-      for (var key in body) {
-        var current = body[key];
-        if (matchCampaignCountries(current.targetedCountries, adExchangeCountry)){
-          matchedCampaigns.push(current);
-        }
-      }
-      if (matchedCampaigns.length != 0){
-        ascShortedCampaigns = shortCampaignsOnPrice(matchedCampaigns);
-        winningCampaign = ascShortedCampaigns[ascShortedCampaigns.length -1];
-        console.log("FOUND " + ascShortedCampaigns.length + " Matching Campains");
-        console.log("Highest Prized Campaign is -->");
-        console.log( "       campaignId::"+ winningCampaign.id.toString()+ " with price::" + winningCampaign.price);
-        matchingCampaign = true;
-
-        //Create json response
-        jsonRes = [];
-        var resData = {id: "e7fe51ce4f6376876353ff0961c2cb0d", //This is wrongly hardcoded (I know)
-         bid:
-          {
-            campaignId: winningCampaign.id ,
-            price: winningCampaign.price,
-             adm: winningCampaign.adm} }
-
-        jsonRes = JSON.stringify(resData);
-     
-      }
-      else{ //country not found
-        matchingCampaign  = false;
-        console.log("Matching Campaigns for country" + adExchangeCountry + "NOT FOUND");
-      }
-    }
-    else{ //error in calling campaign api
-      matchingCampaign =false;  
-      console.log("ERROR::" + err + "in Get Campaigns from REMOTE SERVER");
-      
-    }
- 	});
-
-  
-	//next();
-	if(matchingCampaign == true){
-  	//res.writeHead(200, {"Content-Type": "application/json"});
-    res.setHeader('Content-Type', 'application/json');
-    	res.send(jsonRes);
-    }
-	else
-	{
-		res.sendStatus(204);
-	}
+	console.log("AdExchange_Id:" + adExchangeRequestId);
+ 	console.log("AdExchange requests bid for Country::::" + adExchangeCountry);
+	
+	getCampaigns(adExchangeRequestId, adExchangeCountry, res);
+	
+ 	
 });
  
+
+
+
+function getCampaigns(adExchangeRequestId, adExchangeCountry, res){ //var promise = new Promise(function (resolve, reject)
+	var options = {
+    uri:'https://private-anon-84a078b774-campaignapi9.apiary-mock.com/campaigns',
+   };
+
+rp(options)
+    .then(function (response) {
+        console.log(response);
+        var matchedCampaigns = [];
+		var winningCampaign;
+		var body = JSON.parse(response);
+		var matchingCampaign;
+      	for (var key in body) {
+        	var current = body[key];
+        	if (matchCampaignCountries(current.targetedCountries, adExchangeCountry)){
+        		matchedCampaigns.push(current);
+        	}
+      	}
+      	if (matchedCampaigns.length != 0){
+        	ascShortedCampaigns = shortCampaignsOnPrice(matchedCampaigns);
+        	winningCampaign = ascShortedCampaigns[ascShortedCampaigns.length -1];
+        	console.log("FOUND " + ascShortedCampaigns.length + " Matching Campains");
+        	console.log("Highest Prized Campaign is -->");
+        	console.log( "       campaignId::"+ winningCampaign.id.toString()+ " with price::" + winningCampaign.price);
+        	matchingCampaign = true;
+
+        	//Create json response
+        	jsonRes = createJSONResponse(adExchangeRequestId, winningCampaign);
+        	console.log("Sendding bid ......... ");
+    		res.setHeader('Content-Type', 'application/json');
+    		res.send(jsonRes);
+      	}
+      	else{ //country not found
+        	console.log("Matching Campaigns for country" + adExchangeCountry + "NOT FOUND");
+      	}
+    })
+    .catch(function (err) {
+      	console.log("ERROR::" + err + "in Get Campaigns from REMOTE SERVER");
+      	console.log("Sendding 204 ......... ");
+		res.sendStatus(204);
+    });
+
+    
+}
+
+function createJSONResponse(adExchangeRequestId, winningCampaign){
+	var jsonResponse = [];
+	var resData = {id: adExchangeRequestId, 
+	bid:
+	{
+	campaignId: winningCampaign.id ,
+	price: winningCampaign.price,
+	adm: winningCampaign.adm} }
+	
+	jsonResponse = JSON.stringify(resData);    
+	return jsonResponse;
+}
 
 
 function matchCampaignCountries (targetedCountries, adExchangeCountry){
@@ -124,14 +126,6 @@ function matchCampaignCountries (targetedCountries, adExchangeCountry){
   	return false;
 }
 
-
-function getAdExchangeCountry(adExchangeReqBody){
-	
-	
-	console.log("Device: " + adExchangeRequestBody[0].device.geo.country);
-
-	return adExchangeRequestBody[0].device.geo.country;	
-}
 
 
 function shortCampaignsOnPrice(matchedCampaigns){
