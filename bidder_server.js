@@ -68,7 +68,7 @@ app.post('/bid',function(req, res) {
 
 /***********************************************************
 *
-* Implmements the exectuion wotkflow of campaign matching
+* Implements the exectuion wotkflow of campaign matching
 * process, creates and responses back to AdExchange client.
 * The external Campaign API call is implemented to be promise
 * based so as to wait until the get campaign response is received.  
@@ -111,7 +111,7 @@ rp(options)
     		res.send(jsonRes);
       	}
       	else{ //country not found
-        	console.log("Matching Campaigns for country" + adExchangeCountry + "NOT FOUND");
+        	console.log("Matching Campaigns for country :: " + adExchangeCountry + " NOT FOUND");
       	}
     })
     .catch(function (err) {
@@ -122,6 +122,7 @@ rp(options)
 
     
 }
+
 
 
 /***********************************************************
@@ -146,6 +147,7 @@ function matchCampaignCountries (targetedCountries, adExchangeCountry){
   	
   	return false;
 }
+
 
 
 /***********************************************************
@@ -174,6 +176,7 @@ function shortCampaignsOnPrice(matchedCampaigns){
 	}
    return shortedCampaigns;
 }
+
 
 
 /***********************************************************
