@@ -1,15 +1,21 @@
 Dear Avocarrotians,
 The bidder server was implemented in node.js version v7.10.1.
 For mocking up the server I have used postman
-For tests i have used mocha 1.20.1 suites.
+For tests i have used mocha 1.20.1 suite.
 
-1.Install nodejs and npm running the following:    
+1.Install nodejs and npm running the following or run $sudo ./install_software.sh:    
 --> sudo apt-get update
 --> sudo apt-get install curl
 --> curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
 --> sudo apt-get install -y nodejs
 --> sudo apt-get install npm
 
+2.Install bidder_server required modules by running:
+$ $sudo ./install_modules.sh
+
+3.For steps 2&3 you might need to change installation scripts permissions by running chmod +x "filename"
+
+3.Copy files _config.js and test_helper.js in the /node_modules dir
 
 For starting the server:
  -- $nodejs bidder_server

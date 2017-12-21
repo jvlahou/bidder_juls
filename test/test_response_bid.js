@@ -1,5 +1,4 @@
 var config = require('_config');
-var json_templates = require('json_templates');
 var chai = require('chai');
 var chaiHttp = require('chai-http');
 var server = require('../bidder_server');
