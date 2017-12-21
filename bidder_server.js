@@ -1,22 +1,30 @@
 
+/***********************************************************
+*
+* Implementation of Avocarrot's real-time bidder server
+* Created on 17 Deecember 2017
+* @uthor juls
+* 
+/***********************************************************/
 
-// Required modules
+//Import modules
 var express = require('express');
 var bodyParser = require("body-parser");
 var request = require("request");
 var config = require('_config');
 var async = require('async');
 var rp = require('request-promise');
-// Create the app
+
+
+//Create the app
 var app = express();
 
-//Here we are configuring express to use body-parser as middle-ware.
+
+// Express configuration for using 
+// body-parser as middle-ware.
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-//Global vars
-var jsonRes; //Final response
-var matchingCampaign;
 
 
 // Set up the server
@@ -33,18 +41,23 @@ function listen() {
 }
 
 
+/***********************************************************
+*
+* POST bid callback function.
+*
+************************************************************/
+
 
 app.post('/bid',function(req, res) {
 	
-	console.log('\nPOST bid is called');
-	console.log("Body:" + req.body);
- 	
+	console.log('\nPOST bid is called'); 	
+	
 	var adExchangeRequestId = req.body.id;
 	var adExchangeCountry = req.body.device.geo.country;
 	var campaignServiceError = 204;
 
-	console.log("AdExchange_Id:" + adExchangeRequestId);
- 	console.log("AdExchange requests bid for Country::::" + adExchangeCountry);
+	console.log("AdExchange Client ReqId :::: " + adExchangeRequestId);
+ 	console.log("AdExchange Client requests bid for Country :::: " + adExchangeCountry);
 	
 	getCampaigns(adExchangeRequestId, adExchangeCountry, res);
 	
@@ -53,36 +66,47 @@ app.post('/bid',function(req, res) {
  
 
 
+/***********************************************************
+*
+* Implmements the exectuion wotkflow of campaign matching
+* process, creates and responses back to AdExchange client.
+* The external Campaign API call is implemented to be promise
+* based so as to wait until the get campaign response is received.  
+*
+*
+* @param adExchangeRequestId: AdExcHahge id, exported from POST bid
+* @param adExchangeCountry: the country of AdExchange POST request
+* @return bool according to matching
+************************************************************/
 
-function getCampaigns(adExchangeRequestId, adExchangeCountry, res){ //var promise = new Promise(function (resolve, reject)
+function getCampaigns(adExchangeRequestId, adExchangeCountry, res){ 
 	var options = {
     uri:'https://private-anon-84a078b774-campaignapi9.apiary-mock.com/campaigns',
    };
 
 rp(options)
     .then(function (response) {
-        console.log(response);
         var matchedCampaigns = [];
 		var winningCampaign;
+		var jsonRes;
+
 		var body = JSON.parse(response);
-		var matchingCampaign;
       	for (var key in body) {
         	var current = body[key];
         	if (matchCampaignCountries(current.targetedCountries, adExchangeCountry)){
         		matchedCampaigns.push(current);
         	}
       	}
+      	console.log("Received " + key + " Campains from Campaign API");
       	if (matchedCampaigns.length != 0){
         	ascShortedCampaigns = shortCampaignsOnPrice(matchedCampaigns);
         	winningCampaign = ascShortedCampaigns[ascShortedCampaigns.length -1];
         	console.log("FOUND " + ascShortedCampaigns.length + " Matching Campains");
-        	console.log("Highest Prized Campaign is -->");
-        	console.log( "       campaignId::"+ winningCampaign.id.toString()+ " with price::" + winningCampaign.price);
-        	matchingCampaign = true;
+        	console.log("Highest Prized Campaign is --> campaignId :: " + winningCampaign.id.toString() + " //  Price :: " + winningCampaign.price);
 
         	//Create json response
         	jsonRes = createJSONResponse(adExchangeRequestId, winningCampaign);
-        	console.log("Sendding bid ......... ");
+        	console.log("Sending bid ......... ");
     		res.setHeader('Content-Type', 'application/json');
     		res.send(jsonRes);
       	}
@@ -92,33 +116,30 @@ rp(options)
     })
     .catch(function (err) {
       	console.log("ERROR::" + err + "in Get Campaigns from REMOTE SERVER");
-      	console.log("Sendding 204 ......... ");
+      	console.log("Sending 204 ......... ");
 		res.sendStatus(204);
     });
 
     
 }
 
-function createJSONResponse(adExchangeRequestId, winningCampaign){
-	var jsonResponse = [];
-	var resData = {id: adExchangeRequestId, 
-	bid:
-	{
-	campaignId: winningCampaign.id ,
-	price: winningCampaign.price,
-	adm: winningCampaign.adm} }
-	
-	jsonResponse = JSON.stringify(resData);    
-	return jsonResponse;
-}
 
-
+/***********************************************************
+*
+* Checks if the AdExchanage Country
+* is matched in a single campaigns 
+* targeted countries.
+*
+* @param targetedCountries: array with campaign countries
+* @param adExchangeCountry: the country of AdExchange POST request
+* @return bool according to matching
+************************************************************/
 function matchCampaignCountries (targetedCountries, adExchangeCountry){
 	var campaignCountries = [];
   	var currentCountries = targetedCountries.toString().split(',');
   	for (var index in currentCountries){
   		if (currentCountries[index].toString() == adExchangeCountry.toString()){
-        console.log("Found Campaign with TargetedCountries::" + currentCountries[index]);
+        //console.log("Found Campaign with TargetedCountries::" + currentCountries[index]);
   			return true;
   		}
   	}
@@ -127,7 +148,15 @@ function matchCampaignCountries (targetedCountries, adExchangeCountry){
 }
 
 
-
+/***********************************************************
+*
+* Shorts all the matched campaings based on price
+* in ascending order
+* 
+* @param matchedCampaigns: array with campaign that matched
+* @return asc shorted array
+*
+************************************************************/
 function shortCampaignsOnPrice(matchedCampaigns){
 	var shortedCampaigns = [];
 	for (var key in matchedCampaigns) {
@@ -143,11 +172,31 @@ function shortCampaignsOnPrice(matchedCampaigns){
 			shortedCampaigns.push(poped);	
 		}
 	}
-  /*
-  for (var i in shortedCampaigns){
-            console.log(i + "th country:: " + shortedCampaigns[i].targetedCountries + " Price::" + shortedCampaigns[i].price + '\n');
-  }
-  */
-  return shortedCampaigns;
+   return shortedCampaigns;
 }
+
+
+/***********************************************************
+*
+* Creates the response in case of a campaign mathes the
+* criteria
+*
+* @param adExchangeRequestId: AdExcHahge id, exported from POST bid
+* @param winningCampaign: the selected campaign to be sent
+* @return the response body in json format
+*
+************************************************************/
+function createJSONResponse(adExchangeRequestId, winningCampaign){
+	var jsonResponse = [];
+	var resData = {id: adExchangeRequestId, 
+	bid:
+	{
+	campaignId: winningCampaign.id ,
+	price: winningCampaign.price,
+	adm: winningCampaign.adm} }
+	
+	jsonResponse = JSON.stringify(resData);    
+	return jsonResponse;
+}
+
 
