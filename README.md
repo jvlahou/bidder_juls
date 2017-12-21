@@ -17,9 +17,7 @@ Mocha 1.20.1 suite was used for implementing and running tests .
 
 #3.For steps 2&3 you might need to change installation scripts permissions by running chmod +x "filename"
 
-#4.Copy files _config.js and test_helper.js in the /node_modules dir
-
-#5.export NODE_PATH=/home/julie/Desktop/bidder_juls/node_modules 
+#4.export NODE_PATH=/home/julie/Desktop/bidder_juls/node_modules 
 # replace "project_direcory"/node_modules
 
 #For starting the server:
