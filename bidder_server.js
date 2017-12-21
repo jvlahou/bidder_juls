@@ -81,7 +81,7 @@ app.post('/bid',function(req, res) {
 
 function getCampaigns(adExchangeRequestId, adExchangeCountry, res){ 
 	var options = {
-    uri:'https://private-anon-84a078b774-campaignapi9.apiary-mock.com/campaigns',
+    uri:'https://private-anon-84a078b774-campaignapi9.apiary-mock.com/campaigns', //config.campaignsURI.development
    };
 
 rp(options)

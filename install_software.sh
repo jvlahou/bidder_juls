@@ -1,3 +1,5 @@
+#!/bin/sh
+
 apt-get update
 apt-get install curl
 curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -

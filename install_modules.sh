@@ -1,3 +1,5 @@
+#!/bin/sh
+
 apt-get update
 apt-get install nodejs
 apt-get install mocha
@@ -20,4 +22,6 @@ npm install glob --save
 ln -s /usr/bin/nodejs /usr/bin/node
 touch test/test_response_bid.js
 #
+
+
 
