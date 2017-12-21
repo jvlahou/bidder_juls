@@ -47,6 +47,7 @@ chai.use(chaiHttp);
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.should.be.a('object');
+                res.body.should.have.property('id');
                 res.body.should.have.property('bid');
                 res.body.bid.should.have.property('price');
                 res.body.bid.should.have.property('adm');
@@ -64,7 +65,7 @@ chai.use(chaiHttp);
             .send(response_without_bid)
             .end((err, res) => {
                 res.should.have.status(204);
-                res.body.should.be.eql(null);
+                res.body.should.be.eql({});
                 done();
             });
       });

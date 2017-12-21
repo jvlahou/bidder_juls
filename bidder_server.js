@@ -2,7 +2,7 @@
 /***********************************************************
 *
 * Implementation of Avocarrot's real-time bidder server
-* Created on 17 Deecember 2017
+* Created on 17 December 2017
 * @uthor juls
 * 
 /***********************************************************/
@@ -112,12 +112,15 @@ rp(options)
       	}
       	else{ //country not found
         	console.log("Matching Campaigns for country :: " + adExchangeCountry + " NOT FOUND");
+        	//res.setHeader('Content-Type', 'application/json');
+        	console.log("Sending 204 ......... ");
+        	res.sendStatus(204);
       	}
     })
     .catch(function (err) {
       	console.log("ERROR::" + err + "in Get Campaigns from REMOTE SERVER");
-      	console.log("Sending 204 ......... ");
-		res.sendStatus(204);
+      	console.log("Sending " + err + "......... ");
+		res.sendStatus(err);
     });
 
     

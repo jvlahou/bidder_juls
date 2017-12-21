@@ -1,26 +1,24 @@
 #!/bin/sh
 
-apt-get update
-apt-get install nodejs
 apt-get install mocha
-apt-get npm
 npm init
 #dev
-npm install express --save
+npm install express --save-dev
 npm install request --save-dev
 npm install promise-any
-npm install request-promise --save
-npm install async
+npm install request-promise --save-dev
+npm install async --save-dev
 
 #test
-npm install chai
+npm install chai --save-dev
 npm install chai-http --save-dev
 npm install babel-preset-env --save-dev
-npm install diff --save
-npm install commander --save
-npm install glob --save
+npm install diff --save-dev
+npm install commander --save-dev
+npm install glob --save-dev
 ln -s /usr/bin/nodejs /usr/bin/node
 touch test/test_response_bid.js
+#export NODE_PATH=/home/julie/Desktop/bidder_juls/node_modules 
 #
 
 

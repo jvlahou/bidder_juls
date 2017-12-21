@@ -13,16 +13,19 @@ For implemented and running tests mocha 1.20.1 suite was used.
 --> sudo apt-get install npm
 
 #2.Install bidder_server required modules by running:
-$ $sudo ./install_modules.sh
+ -- $sudo ./install_modules.sh
 
 #3.For steps 2&3 you might need to change installation scripts permissions by running chmod +x "filename"
 
 #4.Copy files _config.js and test_helper.js in the /node_modules dir
 
+#5.export NODE_PATH=/home/julie/Desktop/bidder_juls/node_modules 
+# replace "project_direcory"/node_modules
+
 #For starting the server:
  -- $nodejs bidder_server
 
 #For running tests :
-#Optional timeout flag only in case of timeout thrown 
-#exception due to async func call
+#Optional timeout flag only in case of timeout exception 
+#thrown due to func call of remote API 
  -- $mocha --timeout 5000 test/test_response_bid.js
