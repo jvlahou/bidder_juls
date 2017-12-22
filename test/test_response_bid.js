@@ -38,7 +38,6 @@ var should = chai.should();
 
 
 chai.use(chaiHttp);
-
   describe('/POST bid with bid in response', () => {
       it('POST bid', (done) => {
         chai.request(server)
