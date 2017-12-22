@@ -3,7 +3,9 @@ Dear Avocarrotians,
 The bidder server (https://avocarrot.github.io/hiring/back-end/bidder-exercise/assignment.html)
 was implemented using node.js version v7.10.1 in (OS)Ubuntu 16.04.
 Postman v1.6.15 was used for mocking up the server 
-Mocha 1.20.1 suite was used for implementing and running tests .
+Mocha 1.20.1 suite was used for implementing and running tests.
+Regarding request validation, no request validation schema is implemented,
+i just check required fields and no empty body.
 
 #1.Install nodejs and npm running the following or run $sudo ./install_software.sh:    
 --> sudo apt-get update

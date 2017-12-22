@@ -52,20 +52,22 @@ app.post('/bid',function(req, res) {
 	
 	console.log('\nPOST bid is called'); 	
 	try{
-	var adExchangeRequestId = req.body.id;
-	var adExchangeCountry = req.body.device.geo.country;
-	var campaignServiceError = 204;
+		if(req.body.id == undefined || req.body.device.geo.country == undefined || req.body == {} )
+			throw "Incorrect request, missing fieds"
+		var adExchangeRequestId = req.body.id;
+		var adExchangeCountry = req.body.device.geo.country;
 
-	console.log("AdExchange Client ReqId :::: " + adExchangeRequestId);
- 	console.log("AdExchange Client requests bid for Country :::: " + adExchangeCountry);
+		console.log("AdExchange Client ReqId :::: " + adExchangeRequestId);
+ 		console.log("AdExchange Client requests bid for Country :::: " + adExchangeCountry);
 	
-	getCampaigns(adExchangeRequestId, adExchangeCountry, res);
+		getCampaigns(adExchangeRequestId, adExchangeCountry, res);
 	}
  	catch(err) {
       	console.log("ERROR::" + err + " Reading AdExchange client request");
       	console.log("Sending " + err + "......... ");
-		res.sendStatus(err);
-    	}
+      	//Bad request
+		res.sendStatus(400);
+    }
 });
  
 
