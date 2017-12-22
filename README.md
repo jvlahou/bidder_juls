@@ -7,12 +7,9 @@ Mocha 1.20.1 suite was used for implementing and running tests.
 Regarding request validation, no request validation schema is implemented,
 i just check required fields and no empty body.
 
-#1.Install nodejs and npm running the following or run $sudo ./install_software.sh:    
---> sudo apt-get update
---> sudo apt-get install curl
---> curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
---> sudo apt-get install -y nodejs
---> sudo apt-get install npm
+#1.Install nodejs and npm running the following or run 
+ -- $sudo ./install_software.sh   
+
 
 #2.Install bidder_server required modules by running:
  -- $sudo ./install_modules.sh
@@ -20,7 +17,7 @@ i just check required fields and no empty body.
 #3.For steps 2&3 you might need to change installation scripts permissions by running chmod +x "filename"
 
 #4.export NODE_PATH=/home/julie/Desktop/bidder_juls/node_modules 
-# replace "project_direcory"/node_modules
+ replace the above with you own project_dirctory "project_direcory"/node_modules
 
 #For starting the server:
  -- $nodejs bidder_server
